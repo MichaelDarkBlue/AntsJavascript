@@ -9,12 +9,19 @@ function ready() {
     let app = new PIXI.Application({ width: 640, height: 360 });
     document.body.appendChild(app.view);
 
-    app.stage.addChild(ant);
+    var ants = [];
+    for (let i = 0; i < 100; i++) {
+        let ant = getAnt(antColorRed);
+        ants.push(ant);
+        app.stage.addChild(ant);
+    }
+
 
     requestAnimationFrame(update);
 
     function update() {
-        ant.position.x += 1;
+
+        ants.forEach(ant => { moveRandom(ant) });
     
         app.render(app.stage);
         
