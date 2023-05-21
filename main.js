@@ -9,11 +9,20 @@ function ready() {
     let app = new PIXI.Application({ width: screen.width, height: screen.height });
     document.body.appendChild(app.view);
 
-    var ants = [];
+
+    var gameEntities = [];
+    // add ants
     for (let i = 0; i < 1000; i++) {
         let ant = getAnt(antColorRed);
-        ants.push(ant);
+        gameEntities.push(ant);
         app.stage.addChild(ant);
+    }
+
+    // add bugs
+    for (let i = 0; i < 100; i++) {
+        let bug = getBug();
+        gameEntities.push(bug);
+        app.stage.addChild(bug);
     }
 
 
@@ -21,7 +30,7 @@ function ready() {
 
     function update() {
 
-        ants.forEach(ant => { move(ant); });
+        gameEntities.forEach(e => { move(e); });
     
         app.render(app.stage);
         
