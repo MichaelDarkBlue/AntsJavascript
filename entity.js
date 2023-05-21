@@ -8,6 +8,7 @@ var antColorYellow = 0xffff00;
 var antColorDarkYellow = 0x808000;
 var bugColorBrown = 0x8B4513;
 var cooldown = 60;
+var worldSpeed = .5;
 
 var moods = [
     {name:"sad",speed:.25,antColor:antColorDarkYellow,rest:.5,moveDirection:false,randomDirection:false},
@@ -69,8 +70,9 @@ function changeMood(ent, mood) {
 
 function move(ent, time){
     if (Math.random() > ent.mood.rest){
-        moveRandom(ent, time);
-        moveDirection(ent, time);
+        let speed = (ent.mood.speed * worldSpeed * time);
+        moveRandom(ent, speed);
+        moveDirection(ent, speed);
     }else if (ent.mood.randomDirection){
         if (ent.moveCooldown < cooldown) {
             ent.moveCooldown++;
@@ -81,17 +83,16 @@ function move(ent, time){
     }    
 }
 
-function moveRandom(ent, time) {
+function moveRandom(ent, speed) {
     //using the deta time to move the ant randomly
-    ent.x += Math.random() * time * ent.mood.speed - (ent.mood.speed/2);
-    ent.y += Math.random() * time * ent.mood.speed - (ent.mood.speed/2);
-
+    ent.x += Math.random() * speed - (speed/2);
+    ent.y += Math.random() * speed - (speed/2);
 }
 
-function moveDirection(ent, time) {
+function moveDirection(ent, speed) {
     if (ent.mood.moveDirection){
-        ent.x += Math.cos(ent.direction) * ent.mood.speed * time;
-        ent.y += Math.sin(ent.direction) * ent.mood.speed * time;
+        ent.x += Math.cos(ent.direction) * speed;
+        ent.y += Math.sin(ent.direction) * speed;
     }
 }
 
