@@ -11,12 +11,6 @@ function ready() {
 
 
     var gameEntities = [];
-    // add ants
-    for (let i = 0; i < 1000; i++) {
-        let ant = getAnt(antColorRed);
-        gameEntities.push(ant);
-        app.stage.addChild(ant);
-    }
 
     // add bugs
     for (let i = 0; i < 100; i++) {
@@ -24,13 +18,34 @@ function ready() {
         gameEntities.push(bug);
         app.stage.addChild(bug);
     }
-
+    
+    // add ants
+    for (let i = 0; i < 1000; i++) {
+        let ant = getAnt();
+        gameEntities.push(ant);
+        app.stage.addChild(ant);
+    }
 
     requestAnimationFrame(update);
 
     function update() {
 
-        gameEntities.forEach(e => { move(e); });
+        let bugLocations = "";
+
+        gameEntities.forEach(e => { 
+            move(e); 
+
+            //basic collision detection
+            let location = "" + Math.floor(e.x) + ":" + Math.floor(e.y) + ","
+            if (!e.ant){
+                bugLocations += location;
+            }else{
+                let hit = bugLocations.indexOf(location);
+                if (hit > -1){
+                    e.mood = getMoodByName("angry"); //TODO: setup change mood and color.
+                }
+            }
+        });
     
         app.render(app.stage);
         

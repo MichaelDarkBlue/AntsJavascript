@@ -7,23 +7,25 @@ var antColorDarkBlue = 0x000080;
 var antColorYellow = 0xffff00;
 var antColorDarkYellow = 0x808000;
 var bugColorBrown = 0x8B4513;
+var cooldown = 60;
 
 var moods = [
-    {name:"calm",speed:.5,antColor:antColorDarkRed,rest:.25,moveDirection:false},
-    {name:"happy",speed:1,antColor:antColorYellow,rest:.1,moveDirection:false},
-    {name:"sad",speed:.25,antColor:antColorDarkYellow,rest:.5,moveDirection:false},
-    {name:"excited",speed:.75,antColor:antColorGreen,rest:.05,moveDirection:true},
-    {name:"hungry",speed:.7,antColor:antColorYellow,rest:.25,moveDirection:true},
-    {name:"confused",speed:.80,antColor:antColorBlue,rest:.6,moveDirection:false},
-    {name:"bored",speed:.33,antColor:antColorDarkGreen,rest:.7,moveDirection:false},
-    {name:"scared",speed:1.25,antColor:antColorDarkBlue,rest:.75,moveDirection:false},
-    {name:"surprised",speed:1.25,antColor:antColorYellow,rest:.2,moveDirection:false},
-    {name:"sick",speed:.25,antColor:antColorDarkYellow,rest:.8,moveDirection:false},
-    {name:"angry",speed:1.5,antColor:antColorRed,rest:0,moveDirection:true},
-    {name:"mad",speed:2,antColor:antColorRed,rest:0,moveDirection:true}
+    {name:"sad",speed:.25,antColor:antColorDarkYellow,rest:.5,moveDirection:false,randomDirection:false},
+    {name:"confused",speed:.80,antColor:antColorBlue,rest:.6,moveDirection:false,randomDirection:true},
+    {name:"bored",speed:.33,antColor:antColorDarkGreen,rest:.7,moveDirection:false,randomDirection:false},
+    {name:"calm",speed:.5,antColor:antColorDarkRed,rest:.25,moveDirection:false,randomDirection:true},
+    {name:"happy",speed:1,antColor:antColorYellow,rest:.1,moveDirection:false,randomDirection:true},
+    {name:"excited",speed:.75,antColor:antColorGreen,rest:.05,moveDirection:true,randomDirection:true},
+    {name:"hungry",speed:.7,antColor:antColorYellow,rest:.25,moveDirection:true,randomDirection:true},
+    {name:"scared",speed:1.25,antColor:antColorDarkBlue,rest:.75,moveDirection:false,randomDirection:false},
+    {name:"surprised",speed:1.25,antColor:antColorYellow,rest:.2,moveDirection:false,randomDirection:true},
+    {name:"angry",speed:1.5,antColor:antColorRed,rest:0,moveDirection:true,randomDirection:false},
+    {name:"mad",speed:2,antColor:antColorRed,rest:0,moveDirection:true,randomDirection:false},
+    {name:"sick",speed:.25,antColor:antColorDarkYellow,rest:.8,moveDirection:false,randomDirection:false}
 ];//,"hungry","sleepy","happy","sad","angry","excited","bored","confused","scared","surprised","sick","silly","shy","tired","worried","lonely","proud","puzzled"];
 
-function getAnt(antColor) {
+//ant
+function getAnt() {
     let ant =  new PIXI.Graphics();
     ant.mood = getRandomMood(true);
     ant.beginFill(ant.mood.antColor);
@@ -31,10 +33,14 @@ function getAnt(antColor) {
     ant.endFill();
     ant.x = 100;
     ant.y = 100;
-    ant.direction = Math.random() * 2 * Math.PI;
+    ant.direction = getRandomDirection();
+    ant.MoodCooldown = 0;
+    ant.moveCooldown = Math.floor(Math.random() * cooldown);
+    ant.ant = true;
     return ant;
 }
 
+//bug
 function getBug() {
     let bug =  new PIXI.Graphics();
     bug.mood = getMoodByName("calm");
@@ -44,6 +50,9 @@ function getBug() {
     bug.x = Math.random() * document.body.clientWidth;
     bug.y = Math.random() * document.body.clientHeight;
     bug.direction = Math.random() * 2 * Math.PI;
+    bug.MoodCooldown = 0;
+    bug.moveCooldown = Math.floor(Math.random() * cooldown);
+    bug.ant = false;
     return bug;
 }
 
@@ -51,6 +60,13 @@ function move(ent){
     if (Math.random() > ent.mood.rest){
         moveRandom(ent);
         moveDirection(ent);
+    }else if (ent.mood.randomDirection){
+        if (ent.moveCooldown < cooldown) {
+            ent.moveCooldown++;
+        }else{
+            ent.direction = getRandomDirection();
+            ent.moveCooldown = Math.floor(Math.random() * cooldown);;
+        }
     }    
 }
 
@@ -64,6 +80,10 @@ function moveDirection(ent) {
         ent.x += Math.cos(ent.direction) * ent.mood.speed;
         ent.y += Math.sin(ent.direction) * ent.mood.speed;
     }
+}
+
+function getRandomDirection() {
+    return Math.random() * 2 * Math.PI;
 }
 
 function getRandomMood(start) {
