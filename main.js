@@ -13,7 +13,7 @@ function ready() {
     var gameEntities = [];
 
     // add bugs
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 10; i++) {
         let bug = getBug();
         gameEntities.push(bug);
         app.stage.addChild(bug);
@@ -26,29 +26,28 @@ function ready() {
         app.stage.addChild(ant);
     }
 
-    requestAnimationFrame(update);
+    app.animationUpdate =
+    function(t) {
 
-    function update() {
-
-        let bugLocations = "";
+        //let bugLocations = [];
 
         gameEntities.forEach(e => { 
-            move(e); 
+            move(e,t); 
 
-            //basic collision detection
-            let location = "" + Math.floor(e.x) + ":" + Math.floor(e.y) + ","
+            /* /basic collision detection
+            let location = [Math.floor(e.x),Math.floor(e.y)];
             if (!e.ant){
-                bugLocations += location;
+                bugLocations.push(location);
             }else{
-                let hit = bugLocations.indexOf(location);
-                if (hit > -1){
-                    e.mood = getMoodByName("angry"); //TODO: setup change mood and color.
+                let hit = bugLocations.includes(location);
+                if (hit){
+                    changeMood(e, getMoodByName("surprised"));
                 }
             }
+            */
         });
     
-        app.render(app.stage);
-        
-        requestAnimationFrame(update);
+        app.render(app.stage);        
     }
+    app.ticker.add(app.animationUpdate);
 }

@@ -23,6 +23,7 @@ var moods = [
     {name:"mad",speed:2,antColor:antColorRed,rest:0,moveDirection:true,randomDirection:false},
     {name:"sick",speed:.25,antColor:antColorDarkYellow,rest:.8,moveDirection:false,randomDirection:false}
 ];//,"hungry","sleepy","happy","sad","angry","excited","bored","confused","scared","surprised","sick","silly","shy","tired","worried","lonely","proud","puzzled"];
+var moodsBugs = ["confused","bored","calm","scared","sick"];
 
 //ant
 function getAnt() {
@@ -43,7 +44,9 @@ function getAnt() {
 //bug
 function getBug() {
     let bug =  new PIXI.Graphics();
-    bug.mood = getMoodByName("calm");
+    //get random mood name from moodsBugs array;
+    let mood = moodsBugs[Math.floor(Math.random() * moodsBugs.length)];
+    bug.mood = getMoodByName(mood);
     bug.beginFill(bugColorBrown);
     bug.drawRect(0, 0, 5, 5);
     bug.endFill();
@@ -56,10 +59,18 @@ function getBug() {
     return bug;
 }
 
-function move(ent){
+function changeMood(ent, mood) {
+    ent.mood = mood;
+    ent.beginFill(ent.mood.antColor);
+    ent.drawRect(0, 0, 3, 3);
+    ent.endFill();
+    ent.MoodCooldown = Math.floor(Math.random() * cooldown);
+}
+
+function move(ent, time){
     if (Math.random() > ent.mood.rest){
-        moveRandom(ent);
-        moveDirection(ent);
+        moveRandom(ent, time);
+        moveDirection(ent, time);
     }else if (ent.mood.randomDirection){
         if (ent.moveCooldown < cooldown) {
             ent.moveCooldown++;
@@ -70,15 +81,17 @@ function move(ent){
     }    
 }
 
-function moveRandom(ent) {
-    ent.x += Math.random() * ent.mood.speed - (ent.mood.speed/2);
-    ent.y += Math.random() * ent.mood.speed - (ent.mood.speed/2);
+function moveRandom(ent, time) {
+    //using the deta time to move the ant randomly
+    ent.x += Math.random() * time * ent.mood.speed - (ent.mood.speed/2);
+    ent.y += Math.random() * time * ent.mood.speed - (ent.mood.speed/2);
+
 }
 
-function moveDirection(ent) {
+function moveDirection(ent, time) {
     if (ent.mood.moveDirection){
-        ent.x += Math.cos(ent.direction) * ent.mood.speed;
-        ent.y += Math.sin(ent.direction) * ent.mood.speed;
+        ent.x += Math.cos(ent.direction) * ent.mood.speed * time;
+        ent.y += Math.sin(ent.direction) * ent.mood.speed * time;
     }
 }
 
