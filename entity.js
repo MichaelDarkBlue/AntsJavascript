@@ -8,12 +8,12 @@ var antColorYellow = 0xffff00;
 var antColorDarkYellow = 0x808000;
 var bugColorBrown = 0x8B4513;
 var cooldown = 60;
-var worldSpeed = .5;
+var worldSpeed = 1;
 
 var moods = [
-    {name:"sad",speed:.25,antColor:antColorDarkYellow,rest:.5,moveDirection:false,randomDirection:false},
-    {name:"confused",speed:.80,antColor:antColorBlue,rest:.6,moveDirection:false,randomDirection:true},
-    {name:"bored",speed:.33,antColor:antColorDarkGreen,rest:.7,moveDirection:false,randomDirection:false},
+    {name:"sad",speed:2.25,antColor:antColorDarkYellow,rest:.5,moveDirection:false,randomDirection:true},
+    {name:"confused",speed:.80,antColor:antColorBlue,rest:.6,moveDirection:true,randomDirection:true},
+    {name:"bored",speed:.25,antColor:antColorDarkGreen,rest:.7,moveDirection:true,randomDirection:true},
     {name:"calm",speed:.5,antColor:antColorDarkRed,rest:.25,moveDirection:false,randomDirection:true},
     {name:"happy",speed:1,antColor:antColorYellow,rest:.1,moveDirection:false,randomDirection:true},
     {name:"excited",speed:.75,antColor:antColorGreen,rest:.05,moveDirection:true,randomDirection:true},
@@ -29,7 +29,7 @@ var moodsBugs = ["confused","bored","calm","scared","sick"];
 //ant
 function getAnt() {
     let ant =  new PIXI.Graphics();
-    ant.mood = getRandomMood(true);
+    ant.mood = getMoodByName("bored"); //getRandomMood(true);
     ant.beginFill(ant.mood.antColor);
     ant.drawRect(0, 0, 3, 3);
     ant.endFill();

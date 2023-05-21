@@ -3,24 +3,49 @@ document.addEventListener("DOMContentLoaded", () => {
     ready();
   });
 
+function getWidth() {
+return Math.max(
+    document.body.scrollWidth,
+    document.documentElement.scrollWidth,
+    document.body.offsetWidth,
+    document.documentElement.offsetWidth,
+    document.documentElement.clientWidth
+);
+}
+
+function getHeight() {
+return Math.max(
+    document.body.scrollHeight,
+    document.documentElement.scrollHeight,
+    document.body.offsetHeight,
+    document.documentElement.offsetHeight,
+    document.documentElement.clientHeight
+);
+}
 
 function ready() {
+    let width = getWidth();
+    let height = getHeight();
+    document.body.style.margin = "0px";
+    document.body.style.overflow = "hidden";
     // Create the application helper and add its render target to the page
-    let app = new PIXI.Application({ width: screen.width, height: screen.height });
+    let app = new PIXI.Application({ width: width, height: height });
     document.body.appendChild(app.view);
 
+    //create a quad tree for object collision detection
+    let quadTree = new Quadtree({x: 0,y: 0,width: width,height: height}, 4,4);
 
     var gameEntities = [];
 
     // add bugs
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 100; i++) {
         let bug = getBug();
         gameEntities.push(bug);
         app.stage.addChild(bug);
     }
     
     // add ants
-    for (let i = 0; i < 1000; i++) {
+    for (let i = 0; i < 100; i++) {
         let ant = getAnt();
         gameEntities.push(ant);
         app.stage.addChild(ant);
@@ -30,10 +55,11 @@ function ready() {
     function(t) {
 
         //let bugLocations = [];
+        quadTree.clear();
 
         gameEntities.forEach(e => { 
             move(e,t); 
-
+            quadTree.insert(e);
             /* /basic collision detection
             let location = [Math.floor(e.x),Math.floor(e.y)];
             if (!e.ant){
@@ -45,8 +71,25 @@ function ready() {
                 }
             }
             */
+           if(t > 2){
+                let entities = quadTree.retrieve(e);
+                if (entities.length < 30){
+                    entities.forEach(e2 => {
+                        if (e.ant && !e2.ant){
+                            if (Math.floor(e.x) == Math.floor(e2.x) && Math.floor(e.y) == Math.floor(e2.y)){
+                                if(e.mood.name == "surprised"){
+                                    changeMood(e, getMoodByName("angry"));
+                                }else{
+                                    changeMood(e, getMoodByName("surprised"));
+                            }
+                            }
+                        }
+                    });
+                }
+           }
         });
-    
+        
+        //quad tree collision detection
         app.render(app.stage);        
     }
     app.ticker.add(app.animationUpdate);
