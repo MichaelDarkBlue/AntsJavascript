@@ -1,17 +1,11 @@
-var antColorRed = 0xff0000;
-var antColorDarkRed = 0x800000;
-var antColorGreen = 0x00ff00;
-var antColorDarkGreen = 0x008000;
-var antColorBlue = 0x0000ff;
-var antColorDarkBlue = 0x000080;
-var antColorYellow = 0xffff00;
-var antColorDarkYellow = 0x808000;
-var bugColorBrown = 0x8B4513;
-var foodColorOrange = 0xffa500;
-var cooldown = 60;
-var worldSpeed = 1;
+var antsApp = {};
+antsApp.gameEntities = [];
+antsApp.cooldown = 60;
+antsApp.worldSpeed = 1;
+antsApp.antBugRange = 10;
 
-var moods = [
+antsApp.entity = {};
+antsApp.entity.moods = [
     {name:"confused",speed:.80,antColor:antColorBlue,rest:.6,moveDirection:true,randomDirection:true},
     {name:"bored",speed:.25,antColor:antColorDarkGreen,rest:.7,moveDirection:true,randomDirection:true},
     {name:"calm",speed:.5,antColor:antColorDarkRed,rest:.25,moveDirection:true,randomDirection:true},
@@ -26,13 +20,13 @@ var moods = [
     {name:"sick",speed:.25,antColor:antColorDarkYellow,rest:.8,moveDirection:false,randomDirection:false},
     {name:"food",speed:0,antColor:foodColorOrange,rest:1,moveDirection:false,randomDirection:false}
 ];//,"hungry","sleepy","happy","sad","angry","excited","bored","confused","scared","surprised","sick","silly","shy","tired","worried","lonely","proud","puzzled"];
-var startingMoods = ["calm","happy","excited","hungry"];
-var moodsBugs = ["confused","bored","calm","scared","sick"];
+antsApp.entity.startingMoods = ["calm","happy","excited","hungry"];
+antsApp.entity.moodsBugs = ["confused","bored","calm","scared","sick"];
 
 //ant
-function getAnt() {
-    let ant =  getBase();
-    ant.mood = getMoodByName(startingMoods[Math.floor(Math.random() * startingMoods.length)]);
+antsApp.entity.getAnt = function () {
+    let ant =  antsApp.entity.getBase();
+    ant.mood = antsApp.entity.getMoodByName(antsApp.entity.startingMoods[Math.floor(Math.random() * antsApp.entity.startingMoods.length)]);
     //getMoodByName(startingMoods[Math.floor(Math.random() * startingMoods.length)]); 
     //getMoodByName("happy");
     ant.beginFill(ant.mood.antColor);
@@ -43,25 +37,30 @@ function getAnt() {
     return ant;
 }
 
-function getBase(){
+antsApp.entity.getBase = function (){
     let base =  new PIXI.Graphics();
     base.x = Math.random() * document.body.clientWidth;
     base.y = Math.random() * document.body.clientHeight;
     base.direction = Math.random() * 2 * Math.PI;
     base.MoodCooldown = 0;
-    base.moveCooldown = Math.floor(Math.random() * cooldown);
+    base.moveCooldown = Math.floor(Math.random() * antsApp.cooldown);
     base.ant = false;
-    base.tracking = {};
+    //ant is tracking a bug
+    base.track = {};
+    //bug is being tracked by an ant(s)
+    base.tracking = [];
     base.life = 100;
+    //enity base event listener
+    base.event
     return base;
 }
 
 //bug
-function getBug() {
-    let bug =  getBase();
+antsApp.entity.getBug = function() {
+    let bug =  antsApp.entity.getBase();
     //get random mood name from moodsBugs array;
-    let mood = moodsBugs[Math.floor(Math.random() * moodsBugs.length)];
-    bug.mood = getMoodByName(mood);
+    let mood = antsApp.entity.moodsBugs[Math.floor(Math.random() * antsApp.entity.moodsBugs.length)];
+    bug.mood = antsApp.entity.getMoodByName(mood);
     bug.beginFill(bugColorBrown);
     bug.size = 7;
     bug.drawRect(0, 0, bug.size, bug.size);
@@ -69,61 +68,65 @@ function getBug() {
     return bug;
 }
 
-function changeMood(ent, mood) {
+antsApp.entity.changeMood = function(ent, mood) {
     ent.mood = mood;
     ent.beginFill(ent.mood.antColor);
     ent.drawRect(0, 0, ent.size, ent.size);
     ent.endFill();
-    ent.MoodCooldown = Math.floor(Math.random() * cooldown);
+    ent.MoodCooldown = Math.floor(Math.random() * antsApp.cooldown);
 }
 
-function move(ent, time){
+antsApp.entity.move = function(ent, time){
     if (Math.random() > ent.mood.rest){
-        let speed = (ent.mood.speed * worldSpeed * time);
-        moveRandom(ent, speed);
-        moveDirection(ent, speed);
+        let speed = (ent.mood.speed * antsApp.worldSpeed * time);
+        antsApp.entity.moveRandom(ent, speed);
+        antsApp.entity.moveDirection(ent, speed);
     }else if (ent.mood.randomDirection){
-        if (ent.moveCooldown < cooldown) {
+        if (ent.moveCooldown < antsApp.cooldown) {
             ent.moveCooldown++;
         }else{
-            ent.direction = getRandomDirection();
-            ent.moveCooldown = Math.floor(Math.random() * cooldown);;
+            ent.direction = antsApp.entity.getRandomDirection();
+            ent.moveCooldown = Math.floor(Math.random() * antsApp.cooldown);;
         }
     }    
 }
 
-function moveRandom(ent, speed) {
+antsApp.entity.moveRandom = function(ent, speed) {
     //using the deta time to move the ant randomly
     ent.x += Math.random() * speed - (speed/2);
     ent.y += Math.random() * speed - (speed/2);
 }
 
-function moveDirection(ent, speed) {
+antsApp.entity.moveDirection = function(ent, speed) {
     if (ent.mood.moveDirection){
         //if tracking point towards the tracking point
-        if (ent.tracking.x != undefined) {
-            let dx = (ent.tracking.x - ent.x);
-            let dy = (ent.tracking.y - ent.y);
+        if (ent.track.x != undefined) {
+            let dx = (ent.track.x - ent.x);
+            let dy = (ent.track.y - ent.y);
             ent.direction = Math.atan2(dy, dx);
-            moveRandom(ent, 5);
+            antsApp.entity.moveRandom(ent, 5);
         }
         ent.x += Math.cos(ent.direction) * speed;
         ent.y += Math.sin(ent.direction) * speed;
     }
 }
 
-function getRandomDirection() {
+antsApp.entity.getRandomDirection = function() {
     return Math.random() * 2 * Math.PI;
 }
 
-function getRandomMood(start) {
+antsApp.entity.getRandomMood = function(start) {
     if(start){
-        return moods[Math.floor(Math.random() * 7)]; //only the first 6 moods
+        return antsApp.entity.moods[Math.floor(Math.random() * 7)]; //only the first 6 moods
     } else {
-        return moods[Math.floor(Math.random() * (moods.length))];
+        return antsApp.entity.moods[Math.floor(Math.random() * (antsApp.entity.moods.length))];
     }
 }
 
-function getMoodByName(name) {
-    return moods.find(mood => mood.name == name);
+antsApp.entity.getMoodByName = function(name) {
+    return antsApp.entity.moods.find(mood => mood.name == name);
+}
+
+antsApp.entity.getAntsByMood = function(mood) {
+    return antsApp.gameEntities.filter(ant => ant.mood.name == mood);
 }

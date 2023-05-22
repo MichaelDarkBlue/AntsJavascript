@@ -1,16 +1,26 @@
 
 
 //generate a random green color
-function getRandomGreen() {
-    return "rgb(0," + Math.floor(Math.random() * 256) + ",0)";
+function getRandomGroundColor() {
+    return groundColors[Math.floor(Math.random() * groundColors.length)];
 }
 
-function getAnt(antColor) {
-    let ant =  new PIXI.Graphics();
-    ant.beginFill(getRandomGreen());
-    ant.drawRect(0, 0, 3, 3);
-    ant.endFill();
-    ant.x = 100;
-    ant.y = 100;
-    return ant;
+function groundLoop(width, height){
+    let rtn = [];
+    for (let x = 0; x < width; x++){
+        for (let y = 0; y < height; y++){
+            rtn.push(getGroundShape(x,y));
+        }
+    }
+    return rtn;
+}
+
+function getGroundShape(x,y) {
+    let g =  new PIXI.Graphics();
+    g.beginFill(getRandomGroundColor());
+    g.drawRect(0, 0, 1, 1);
+    g.endFill();
+    g.x = x;
+    g.y = y;
+    return g;
 }

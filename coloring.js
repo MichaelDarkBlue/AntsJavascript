@@ -1,0 +1,20 @@
+var antColorRed = 0xff0000;
+var antColorDarkRed = 0x800000;
+var antColorGreen = 0x00ff00;
+var antColorDarkGreen = 0x008000;
+var antColorBlue = 0x0000ff;
+var antColorDarkBlue = 0x000080;
+var antColorYellow = 0xffff00;
+var antColorDarkYellow = 0x808000;
+var bugColorBrown = 0x8B4513;
+var foodColorOrange = 0xffa500;
+var groundBrown = 0x8B4513;
+var groundBrown2 = 0x8B4513;
+var groundBrown3 = 0x8B4513;
+var groundBrown4 = 0x8B4513;
+var groundGreen = 0x008000;
+var groundGreen2 = 0x006400;
+var groundGreen3 = 0x006400;
+var groundGreen4 = 0x006400;
+
+var groundColors = [groundBrown, groundBrown2, groundBrown3, groundBrown4, groundGreen, groundGreen2, groundGreen3, groundGreen4];

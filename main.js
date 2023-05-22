@@ -35,19 +35,23 @@ function ready() {
     //create a quad tree for object collision detection
     let quadTree = new Quadtree({x: 0,y: 0,width: width,height: height}, 4,4);
 
-    var gameEntities = [];
+    // add ground
+    //let ground = groundLoop(width, height);
+    //ground.forEach(g => {
+        //app.stage.addChild(g);
+    //});
 
     // add bugs
     for (let i = 0; i < 100; i++) {
-        let bug = getBug();
-        gameEntities.push(bug);
+        let bug = antsApp.entity.getBug();
+        antsApp.gameEntities.push(bug);
         app.stage.addChild(bug);
     }
     
     // add ants
-    for (let i = 0; i < 1000; i++) {
-        let ant = getAnt();
-        gameEntities.push(ant);
+    for (let i = 0; i < 2; i++) {
+        let ant = antsApp.entity.getAnt();
+        antsApp.gameEntities.push(ant);
         app.stage.addChild(ant);
     }
 
@@ -57,8 +61,8 @@ function ready() {
         //let bugLocations = [];
         quadTree.clear();
 
-        gameEntities.forEach(e => { 
-            move(e,t); 
+        antsApp.gameEntities.forEach(e => { 
+            antsApp.entity.move(e,t); 
             if (!e.ant) quadTree.insert(e);
             /* /basic collision detection
             let location = [Math.floor(e.x),Math.floor(e.y)];
@@ -74,30 +78,39 @@ function ready() {
 
             //lag stopper
            if(t > 1){
+                //quad tree collision detection
                 let entities = quadTree.retrieve(e);
+                //lag detection (too many ants packed into a location will not attack the bug)
                 if (entities.length < 30){
                     entities.forEach(e2 => {
+                        //only ants attack bugs
                         if (e.ant && !e2.ant){
-                            //Math.floor(e.x) == Math.floor(e2.x) && Math.floor(e.y) == Math.floor(e2.y)
+                            //finding a bug around it
                             let diffx = Math.abs(e.x - e2.x);
                             let diffy = Math.abs(e.y - e2.y);
-                            if (diffx < 10 && diffy < 10){
+                            if (diffx < antsApp.antBugRange && diffy < antsApp.antBugRange){
                                 if(e.mood.name == "surprised"){
-                                    changeMood(e, getMoodByName("angry"));
-                                    e.tracking = e2;
+                                    //after being surprised, the ant will become angry
+                                    antsApp.entity.changeMood(e, antsApp.entity.getMoodByName("angry"));
+                                    //the ant will now track the bug
+                                    e.track = e2;
+                                    //the bug will now track the ants
+                                    e2.tracking.push(e);
                                 }else{
+                                    //if already tracking
+
                                     if (e.mood.name != "angry") {
-                                        changeMood(e, getMoodByName("surprised"));
+                                        //before they are angry, they are surprised
+                                        antsApp.entity.changeMood(e, antsApp.entity.getMoodByName("surprised"));
                                     }else{
-                                        //getting hit
+                                        //Now they are angry they will attack and the bug will lose life and then turn into food
                                         e2.life -= 1;
                                         if (e2.life < 1){
-                                            changeMood(e2, getMoodByName("food"));
+                                            antsApp.entity.changeMood(e2, antsApp.entity.getMoodByName("food"));
                                             e2.life = 100;
-                                            //take the any off this list
-                                            let a1 = gameEntities.find(a => a.target == e2);
-                                            a1.forEach(a => {
-                                                changeMood(a, getMoodByName("excited"));
+                                            //Now that the bug is food the ants need to change to excited
+                                            e2.tracking.forEach(a => {
+                                                antsApp.entity.changeMood(a, antsApp.entity.getMoodByName("excited"));
                                                 a.tracking = {};
                                             });
                                         }
