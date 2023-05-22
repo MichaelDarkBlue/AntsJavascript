@@ -42,14 +42,14 @@ function ready() {
     //});
 
     // add bugs
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < antsApp.StartingBugs; i++) {
         let bug = antsApp.entity.getBug();
         antsApp.gameEntities.push(bug);
         app.stage.addChild(bug);
     }
     
     // add ants
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < antsApp.StartingAnts; i++) {
         let ant = antsApp.entity.getAnt();
         antsApp.gameEntities.push(ant);
         app.stage.addChild(ant);
@@ -99,26 +99,28 @@ function ready() {
                                 }
 
                                 //mood progression
-                                let maxProgression = antsApp.entity.AntAttackProgression.length;
+                                let maxProgression = antsApp.entity.AntAttackProgression.length - 1;
                                 let currentProgression = antsApp.entity.AntAttackProgression.indexOf(ant.mood.name);
-                                if (currentProgression == -1){
-                                    currentProgression = 0;
-                                }
+     
                                 //cooldown
-                                if (ant.MoodCooldDown < 1){
+                                if (ant.moodCooldown < 1){
                                     //if not at max progression
                                     if (currentProgression < maxProgression){
                                         antsApp.entity.changeMood(ant, antsApp.entity.getMoodByName(antsApp.entity.AntAttackProgression[currentProgression + 1]));
                                         currentProgression += 1;
                                     }
-                                    ant.MoodCooldDown = antsApp.cooldown;
                                 }else{
-                                    ant.MoodCooldDown -= 1;
+                                    ant.moodCooldown -= 1;
                                 }
 
                                 if (ant.mood.attack){
                                     //Now they are angry they will attack and the bug will lose life and then turn into food
+                                    if (bug.mood.name != "worried"){
+                                        antsApp.entity.changeMood(bug, antsApp.entity.getMoodByName("worried"));
+                                    }
+                                    
                                     bug.life -= 1;
+                                    
                                     if (bug.life < 1){
                                         antsApp.entity.changeMood(bug, antsApp.entity.getMoodByName("food"));
                                         bug.life = 100;

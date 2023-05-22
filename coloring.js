@@ -7,6 +7,7 @@ var antColorDarkBlue = 0x000080;
 var antColorYellow = 0xffff00;
 var antColorDarkYellow = 0x808000;
 var bugColorBrown = 0x8B4513;
+var bugColorDarkBrown = 0x8B4513;
 var foodColorOrange = 0xffa500;
 var groundBrown = 0x8B4513;
 var groundBrown2 = 0x8B4513;

@@ -3,6 +3,8 @@ antsApp.gameEntities = [];
 antsApp.cooldown = 60;
 antsApp.worldSpeed = 1;
 antsApp.antBugRange = 10;
+antsApp.StartingAnts = 1000;
+antsApp.StartingBugs = 100;
 
 antsApp.entity = {};
 antsApp.entity.moods = [
@@ -18,7 +20,8 @@ antsApp.entity.moods = [
     {name:"mad",speed:2,antColor:antColorRed,rest:0,moveDirection:true,randomDirection:false,attack:true},
     {name:"sad",speed:2.25,antColor:antColorDarkYellow,rest:.5,moveDirection:false,randomDirection:true,attack:false},
     {name:"sick",speed:.25,antColor:antColorDarkYellow,rest:.8,moveDirection:false,randomDirection:false,attack:false},
-    {name:"food",speed:0,antColor:foodColorOrange,rest:1,moveDirection:false,randomDirection:false,attack:false}
+    {name:"food",speed:0,antColor:foodColorOrange,rest:1,moveDirection:false,randomDirection:false,attack:false},
+    {name:"worried",speed:1,antColor:bugColorDarkBrown,rest:0,moveDirection:true,randomDirection:true,attack:false}
 ];//,"hungry","sleepy","happy","sad","angry","excited","bored","confused","scared","surprised","sick","silly","shy","tired","worried","lonely","proud","puzzled"];
 antsApp.entity.startingMoods = ["calm","happy","excited","hungry"];
 antsApp.entity.moodsBugs = ["confused","bored","calm","scared","sick"];
@@ -35,6 +38,9 @@ antsApp.entity.getAnt = function () {
     ant.drawRect(0, 0, ant.size, ant.size);
     ant.endFill();
     ant.ant = true;
+    //ants have a different starting position than default
+    ant.x = getWidth() / 2;
+    ant.y = getHeight() / 2;
     return ant;
 }
 
@@ -43,7 +49,7 @@ antsApp.entity.getBase = function (){
     base.x = Math.random() * document.body.clientWidth;
     base.y = Math.random() * document.body.clientHeight;
     base.direction = Math.random() * 2 * Math.PI;
-    base.MoodCooldown = 0;
+    base.moodCooldown = 0;
     base.moveCooldown = Math.floor(Math.random() * antsApp.cooldown);
     base.ant = false;
     //ant is tracking a bug
@@ -74,7 +80,7 @@ antsApp.entity.changeMood = function(ent, mood) {
     ent.beginFill(ent.mood.antColor);
     ent.drawRect(0, 0, ent.size, ent.size);
     ent.endFill();
-    ent.MoodCooldown = Math.floor(Math.random() * antsApp.cooldown);
+    ent.moodCooldown = antsApp.cooldown;
 }
 
 antsApp.entity.move = function(ent, time){
