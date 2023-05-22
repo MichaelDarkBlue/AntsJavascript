@@ -1,10 +1,11 @@
 var antsApp = {};
 antsApp.gameEntities = [];
-antsApp.cooldown = 60;
+antsApp.cooldown = 30;
 antsApp.worldSpeed = 1;
+antsApp.worldSize = 1;
 antsApp.antBugRange = 10;
-antsApp.StartingAnts = 1000;
-antsApp.StartingBugs = 100;
+antsApp.StartingAnts = 100;
+antsApp.StartingBugs = 10;
 
 antsApp.entity = {};
 antsApp.entity.moods = [
@@ -15,9 +16,9 @@ antsApp.entity.moods = [
     {name:"excited",speed:.75,antColor:antColorGreen,rest:.05,moveDirection:true,randomDirection:true,attack:false},
     {name:"hungry",speed:.7,antColor:antColorYellow,rest:.25,moveDirection:true,randomDirection:true,attack:false},
     {name:"scared",speed:1.25,antColor:antColorDarkBlue,rest:.75,moveDirection:false,randomDirection:false,attack:false},
-    {name:"surprised",speed:1.25,antColor:antColorYellow,rest:.2,moveDirection:false,randomDirection:true,attack:false},
+    {name:"surprised",speed:1.25,antColor:antColorYellow,rest:.2,moveDirection:true,randomDirection:true,attack:false},
     {name:"angry",speed:1.5,antColor:antColorRed,rest:0,moveDirection:true,randomDirection:false,attack:true},
-    {name:"mad",speed:2,antColor:antColorRed,rest:0,moveDirection:true,randomDirection:false,attack:true},
+    {name:"mad",speed:2,antColor:antColorRed2,rest:0,moveDirection:true,randomDirection:false,attack:true},
     {name:"sad",speed:2.25,antColor:antColorDarkYellow,rest:.5,moveDirection:false,randomDirection:true,attack:false},
     {name:"sick",speed:.25,antColor:antColorDarkYellow,rest:.8,moveDirection:false,randomDirection:false,attack:false},
     {name:"food",speed:0,antColor:foodColorOrange,rest:1,moveDirection:false,randomDirection:false,attack:false},
@@ -34,7 +35,7 @@ antsApp.entity.getAnt = function () {
     //getMoodByName(startingMoods[Math.floor(Math.random() * startingMoods.length)]); 
     //getMoodByName("happy");
     ant.beginFill(ant.mood.antColor);
-    ant.size = 3;
+    ant.size = 3 * antsApp.worldSize;
     ant.drawRect(0, 0, ant.size, ant.size);
     ant.endFill();
     ant.ant = true;
@@ -57,6 +58,7 @@ antsApp.entity.getBase = function (){
     //bug is being tracked by an ant(s)
     base.tracking = [];
     base.life = 100;
+    base.hitpoints = 1;
     //enity base event listener
     base.event
     return base;
@@ -69,7 +71,7 @@ antsApp.entity.getBug = function() {
     let mood = antsApp.entity.moodsBugs[Math.floor(Math.random() * antsApp.entity.moodsBugs.length)];
     bug.mood = antsApp.entity.getMoodByName(mood);
     bug.beginFill(bugColorBrown);
-    bug.size = 7;
+    bug.size = 7 * antsApp.worldSize;
     bug.drawRect(0, 0, bug.size, bug.size);
     bug.endFill();
     return bug;
@@ -96,6 +98,18 @@ antsApp.entity.move = function(ent, time){
             ent.moveCooldown = Math.floor(Math.random() * antsApp.cooldown);;
         }
     }    
+    /* if the ent goes off the screen move it to the other side
+    if (ent.x > getWidth()) {
+        ent.x = 0;
+    } else if (ent.x < 0) {
+        ent.x = getWidth();
+    }
+    if (ent.y > getHeight()) {
+        ent.y = 0;
+    } else if (ent.y < 0) {
+        ent.y = getHeight();
+    }
+    */
 }
 
 antsApp.entity.moveRandom = function(ent, speed) {

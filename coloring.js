@@ -1,4 +1,5 @@
-var antColorRed = 0xff0000;
+var antColorRed = 0xCC0000;
+var antColorRed2 = 0xff0000;
 var antColorDarkRed = 0x800000;
 var antColorGreen = 0x00ff00;
 var antColorDarkGreen = 0x008000;

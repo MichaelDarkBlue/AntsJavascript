@@ -89,7 +89,7 @@ function ready() {
                             //this ant is near a bug
                             let diffx = Math.abs(ant.x - bug.x);
                             let diffy = Math.abs(ant.y - bug.y);
-                            if (diffx < antsApp.antBugRange && diffy < antsApp.antBugRange){
+                            if (diffx < antsApp.antBugRange * antsApp.worldSize && diffy < antsApp.antBugRange * antsApp.worldSize){
                                 //track this bug
                                 ant.track = bug;
 
@@ -104,10 +104,13 @@ function ready() {
      
                                 //cooldown
                                 if (ant.moodCooldown < 1){
-                                    //if not at max progression
-                                    if (currentProgression < maxProgression){
-                                        antsApp.entity.changeMood(ant, antsApp.entity.getMoodByName(antsApp.entity.AntAttackProgression[currentProgression + 1]));
-                                        currentProgression += 1;
+                                    //if the bug is food then change directly to excited
+                                    if (bug.mood.name == "food"){
+                                        antsApp.entity.changeMood(ant, antsApp.entity.getMoodByName("excited"));
+                                    }else if (currentProgression < maxProgression){
+                                        //if not at max progression
+                                            antsApp.entity.changeMood(ant, antsApp.entity.getMoodByName(antsApp.entity.AntAttackProgression[currentProgression + 1]));
+                                            currentProgression += 1;
                                     }
                                 }else{
                                     ant.moodCooldown -= 1;
@@ -115,22 +118,24 @@ function ready() {
 
                                 if (ant.mood.attack){
                                     //Now they are angry they will attack and the bug will lose life and then turn into food
-                                    if (bug.mood.name != "worried"){
+                                    if (bug.mood.name != "worried" && bug.mood.name != "food"){
                                         antsApp.entity.changeMood(bug, antsApp.entity.getMoodByName("worried"));
                                     }
                                     
-                                    bug.life -= 1;
+                                    bug.life -= ant.hitpoints;
                                     
-                                    if (bug.life < 1){
+                                    if (bug.life < 1 && bug.mood.name != "food"){
                                         antsApp.entity.changeMood(bug, antsApp.entity.getMoodByName("food"));
                                         bug.life = 100;
                                         //Now that the bug is food the ants need to change to excited
                                         bug.tracking.forEach(a => {
                                             antsApp.entity.changeMood(a, antsApp.entity.getMoodByName("excited"));
-                                            a.tracking = {};
+                                            //a.tracking = {};
                                         });
+                                        bug.scale.x = 1.25;
+                                        bug.scale.y = 1.25;
                                     };//else, the bug is still alive
-                                };
+                                };//else, the ant is not angry
                             };//else, too far away
                         };//else, this is not an ant
                     });
