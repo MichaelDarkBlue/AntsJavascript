@@ -7,6 +7,7 @@ var antColorDarkBlue = 0x000080;
 var antColorYellow = 0xffff00;
 var antColorDarkYellow = 0x808000;
 var bugColorBrown = 0x8B4513;
+var foodColorOrange = 0xffa500;
 var cooldown = 60;
 var worldSpeed = 1;
 
@@ -22,51 +23,56 @@ var moods = [
     {name:"angry",speed:1.5,antColor:antColorRed,rest:0,moveDirection:true,randomDirection:false},
     {name:"mad",speed:2,antColor:antColorRed,rest:0,moveDirection:true,randomDirection:false},
     {name:"sad",speed:2.25,antColor:antColorDarkYellow,rest:.5,moveDirection:false,randomDirection:true},
-    {name:"sick",speed:.25,antColor:antColorDarkYellow,rest:.8,moveDirection:false,randomDirection:false}
+    {name:"sick",speed:.25,antColor:antColorDarkYellow,rest:.8,moveDirection:false,randomDirection:false},
+    {name:"food",speed:0,antColor:foodColorOrange,rest:1,moveDirection:false,randomDirection:false}
 ];//,"hungry","sleepy","happy","sad","angry","excited","bored","confused","scared","surprised","sick","silly","shy","tired","worried","lonely","proud","puzzled"];
 var startingMoods = ["calm","happy","excited","hungry"];
 var moodsBugs = ["confused","bored","calm","scared","sick"];
 
 //ant
 function getAnt() {
-    let ant =  new PIXI.Graphics();
+    let ant =  getBase();
     ant.mood = getMoodByName(startingMoods[Math.floor(Math.random() * startingMoods.length)]);
     //getMoodByName(startingMoods[Math.floor(Math.random() * startingMoods.length)]); 
     //getMoodByName("happy");
     ant.beginFill(ant.mood.antColor);
-    ant.drawRect(0, 0, 3, 3);
+    ant.size = 3;
+    ant.drawRect(0, 0, ant.size, ant.size);
     ant.endFill();
-    ant.x = getWidth()/2;
-    ant.y = getHeight()/2;
-    ant.direction = getRandomDirection();
-    ant.MoodCooldown = 0;
-    ant.moveCooldown = Math.floor(Math.random() * cooldown);
     ant.ant = true;
     return ant;
 }
 
+function getBase(){
+    let base =  new PIXI.Graphics();
+    base.x = Math.random() * document.body.clientWidth;
+    base.y = Math.random() * document.body.clientHeight;
+    base.direction = Math.random() * 2 * Math.PI;
+    base.MoodCooldown = 0;
+    base.moveCooldown = Math.floor(Math.random() * cooldown);
+    base.ant = false;
+    base.tracking = {};
+    base.life = 100;
+    return base;
+}
+
 //bug
 function getBug() {
-    let bug =  new PIXI.Graphics();
+    let bug =  getBase();
     //get random mood name from moodsBugs array;
     let mood = moodsBugs[Math.floor(Math.random() * moodsBugs.length)];
     bug.mood = getMoodByName(mood);
     bug.beginFill(bugColorBrown);
-    bug.drawRect(0, 0, 7, 7);
+    bug.size = 7;
+    bug.drawRect(0, 0, bug.size, bug.size);
     bug.endFill();
-    bug.x = Math.random() * document.body.clientWidth;
-    bug.y = Math.random() * document.body.clientHeight;
-    bug.direction = Math.random() * 2 * Math.PI;
-    bug.MoodCooldown = 0;
-    bug.moveCooldown = Math.floor(Math.random() * cooldown);
-    bug.ant = false;
     return bug;
 }
 
 function changeMood(ent, mood) {
     ent.mood = mood;
     ent.beginFill(ent.mood.antColor);
-    ent.drawRect(0, 0, 3, 3);
+    ent.drawRect(0, 0, ent.size, ent.size);
     ent.endFill();
     ent.MoodCooldown = Math.floor(Math.random() * cooldown);
 }
@@ -94,6 +100,13 @@ function moveRandom(ent, speed) {
 
 function moveDirection(ent, speed) {
     if (ent.mood.moveDirection){
+        //if tracking point towards the tracking point
+        if (ent.tracking.x != undefined) {
+            let dx = (ent.tracking.x - ent.x);
+            let dy = (ent.tracking.y - ent.y);
+            ent.direction = Math.atan2(dy, dx);
+            moveRandom(ent, 5);
+        }
         ent.x += Math.cos(ent.direction) * speed;
         ent.y += Math.sin(ent.direction) * speed;
     }

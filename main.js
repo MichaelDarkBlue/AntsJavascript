@@ -79,17 +79,29 @@ function ready() {
                     entities.forEach(e2 => {
                         if (e.ant && !e2.ant){
                             //Math.floor(e.x) == Math.floor(e2.x) && Math.floor(e.y) == Math.floor(e2.y)
-                            let e1x = Math.floor(e.x);
-                            let e1y = Math.floor(e.y);
-                            let e2x = Math.floor(e2.x);
-                            let e2y = Math.floor(e2.y);
-                            let diffx = Math.abs(e1x - e2x);
-                            let diffy = Math.abs(e1y - e2y);
+                            let diffx = Math.abs(e.x - e2.x);
+                            let diffy = Math.abs(e.y - e2.y);
                             if (diffx < 10 && diffy < 10){
                                 if(e.mood.name == "surprised"){
                                     changeMood(e, getMoodByName("angry"));
+                                    e.tracking = e2;
                                 }else{
-                                    if (e.mood.name != "angry") changeMood(e, getMoodByName("surprised"));
+                                    if (e.mood.name != "angry") {
+                                        changeMood(e, getMoodByName("surprised"));
+                                    }else{
+                                        //getting hit
+                                        e2.life -= 1;
+                                        if (e2.life < 1){
+                                            changeMood(e2, getMoodByName("food"));
+                                            e2.life = 100;
+                                            //take the any off this list
+                                            let a1 = gameEntities.find(a => a.target == e2);
+                                            a1.forEach(a => {
+                                                changeMood(a, getMoodByName("excited"));
+                                                a.tracking = {};
+                                            });
+                                        }
+                                    }
                             }
                             }
                         }
