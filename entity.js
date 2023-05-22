@@ -11,30 +11,33 @@ var cooldown = 60;
 var worldSpeed = 1;
 
 var moods = [
-    {name:"sad",speed:2.25,antColor:antColorDarkYellow,rest:.5,moveDirection:false,randomDirection:true},
     {name:"confused",speed:.80,antColor:antColorBlue,rest:.6,moveDirection:true,randomDirection:true},
     {name:"bored",speed:.25,antColor:antColorDarkGreen,rest:.7,moveDirection:true,randomDirection:true},
-    {name:"calm",speed:.5,antColor:antColorDarkRed,rest:.25,moveDirection:false,randomDirection:true},
-    {name:"happy",speed:1,antColor:antColorYellow,rest:.1,moveDirection:false,randomDirection:true},
+    {name:"calm",speed:.5,antColor:antColorDarkRed,rest:.25,moveDirection:true,randomDirection:true},
+    {name:"happy",speed:.6,antColor:antColorYellow,rest:.1,moveDirection:true,randomDirection:true},
     {name:"excited",speed:.75,antColor:antColorGreen,rest:.05,moveDirection:true,randomDirection:true},
     {name:"hungry",speed:.7,antColor:antColorYellow,rest:.25,moveDirection:true,randomDirection:true},
     {name:"scared",speed:1.25,antColor:antColorDarkBlue,rest:.75,moveDirection:false,randomDirection:false},
     {name:"surprised",speed:1.25,antColor:antColorYellow,rest:.2,moveDirection:false,randomDirection:true},
     {name:"angry",speed:1.5,antColor:antColorRed,rest:0,moveDirection:true,randomDirection:false},
     {name:"mad",speed:2,antColor:antColorRed,rest:0,moveDirection:true,randomDirection:false},
+    {name:"sad",speed:2.25,antColor:antColorDarkYellow,rest:.5,moveDirection:false,randomDirection:true},
     {name:"sick",speed:.25,antColor:antColorDarkYellow,rest:.8,moveDirection:false,randomDirection:false}
 ];//,"hungry","sleepy","happy","sad","angry","excited","bored","confused","scared","surprised","sick","silly","shy","tired","worried","lonely","proud","puzzled"];
+var startingMoods = ["calm","happy","excited","hungry"];
 var moodsBugs = ["confused","bored","calm","scared","sick"];
 
 //ant
 function getAnt() {
     let ant =  new PIXI.Graphics();
-    ant.mood = getMoodByName("bored"); //getRandomMood(true);
+    ant.mood = getMoodByName(startingMoods[Math.floor(Math.random() * startingMoods.length)]);
+    //getMoodByName(startingMoods[Math.floor(Math.random() * startingMoods.length)]); 
+    //getMoodByName("happy");
     ant.beginFill(ant.mood.antColor);
     ant.drawRect(0, 0, 3, 3);
     ant.endFill();
-    ant.x = 100;
-    ant.y = 100;
+    ant.x = getWidth()/2;
+    ant.y = getHeight()/2;
     ant.direction = getRandomDirection();
     ant.MoodCooldown = 0;
     ant.moveCooldown = Math.floor(Math.random() * cooldown);
@@ -49,7 +52,7 @@ function getBug() {
     let mood = moodsBugs[Math.floor(Math.random() * moodsBugs.length)];
     bug.mood = getMoodByName(mood);
     bug.beginFill(bugColorBrown);
-    bug.drawRect(0, 0, 5, 5);
+    bug.drawRect(0, 0, 7, 7);
     bug.endFill();
     bug.x = Math.random() * document.body.clientWidth;
     bug.y = Math.random() * document.body.clientHeight;

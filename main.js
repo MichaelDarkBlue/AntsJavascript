@@ -45,7 +45,7 @@ function ready() {
     }
     
     // add ants
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 1000; i++) {
         let ant = getAnt();
         gameEntities.push(ant);
         app.stage.addChild(ant);
@@ -59,7 +59,7 @@ function ready() {
 
         gameEntities.forEach(e => { 
             move(e,t); 
-            quadTree.insert(e);
+            if (!e.ant) quadTree.insert(e);
             /* /basic collision detection
             let location = [Math.floor(e.x),Math.floor(e.y)];
             if (!e.ant){
@@ -71,16 +71,25 @@ function ready() {
                 }
             }
             */
-           if(t > 2){
+
+            //lag stopper
+           if(t > 1){
                 let entities = quadTree.retrieve(e);
                 if (entities.length < 30){
                     entities.forEach(e2 => {
                         if (e.ant && !e2.ant){
-                            if (Math.floor(e.x) == Math.floor(e2.x) && Math.floor(e.y) == Math.floor(e2.y)){
+                            //Math.floor(e.x) == Math.floor(e2.x) && Math.floor(e.y) == Math.floor(e2.y)
+                            let e1x = Math.floor(e.x);
+                            let e1y = Math.floor(e.y);
+                            let e2x = Math.floor(e2.x);
+                            let e2y = Math.floor(e2.y);
+                            let diffx = Math.abs(e1x - e2x);
+                            let diffy = Math.abs(e1y - e2y);
+                            if (diffx < 10 && diffy < 10){
                                 if(e.mood.name == "surprised"){
                                     changeMood(e, getMoodByName("angry"));
                                 }else{
-                                    changeMood(e, getMoodByName("surprised"));
+                                    if (e.mood.name != "angry") changeMood(e, getMoodByName("surprised"));
                             }
                             }
                         }
