@@ -38,8 +38,9 @@ function ready() {
     // add ground
     //let ground = groundLoop(width, height);
     //ground.forEach(g => {
-        //app.stage.addChild(g);
+    //    app.stage.addChild(groundLoop(width, height)); //(g);
     //});
+
 
     // add bugs
     for (let i = 0; i < antsApp.StartingBugs; i++) {
@@ -54,6 +55,8 @@ function ready() {
         antsApp.gameEntities.push(ant);
         app.stage.addChild(ant);
     }
+
+    mouseSetup(app.stage);
 
     app.animationUpdate =
     function(t) {
@@ -78,6 +81,7 @@ function ready() {
 
             //lag stopper
            if(t > 1){
+
                 //quad tree collision detection
                 let entities = quadTree.retrieve(e);
                 //lag detection (too many ants packed into a location will not attack the bug)

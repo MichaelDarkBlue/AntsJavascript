@@ -3,8 +3,8 @@ antsApp.gameEntities = [];
 antsApp.cooldown = 30;
 antsApp.worldSpeed = 1;
 antsApp.worldSize = 1;
-antsApp.antBugRange = 10;
-antsApp.StartingAnts = 100;
+antsApp.antBugRange = 100;
+antsApp.StartingAnts = 1000;
 antsApp.StartingBugs = 10;
 
 antsApp.entity = {};
