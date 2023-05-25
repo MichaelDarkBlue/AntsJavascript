@@ -1,11 +1,15 @@
 var antsApp = {};
+antsApp.pixiApp = {};
+antsApp.width = 640; //this gets updated on load
+antsApp.height = 480;
 antsApp.gameEntities = [];
 antsApp.cooldown = 30;
 antsApp.worldSpeed = 1;
 antsApp.worldSize = 1;
-antsApp.antBugRange = 100;
-antsApp.StartingAnts = 1000;
+antsApp.antBugRange = 1;
+antsApp.StartingAnts = 10;
 antsApp.StartingBugs = 10;
+antsApp.zoomRate = 1.1;
 
 antsApp.entity = {};
 antsApp.entity.moods = [
@@ -40,8 +44,8 @@ antsApp.entity.getAnt = function () {
     ant.endFill();
     ant.ant = true;
     //ants have a different starting position than default
-    ant.x = getWidth() / 2;
-    ant.y = getHeight() / 2;
+    ant.x = antsApp.width / 2;
+    ant.y = antsApp.height / 2;
     return ant;
 }
 

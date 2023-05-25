@@ -3,34 +3,30 @@ document.addEventListener("DOMContentLoaded", () => {
     ready();
   });
 
-function getWidth() {
-return Math.max(
-    document.body.scrollWidth,
-    document.documentElement.scrollWidth,
-    document.body.offsetWidth,
-    document.documentElement.offsetWidth,
-    document.documentElement.clientWidth
-);
-}
-
-function getHeight() {
-return Math.max(
-    document.body.scrollHeight,
-    document.documentElement.scrollHeight,
-    document.body.offsetHeight,
-    document.documentElement.offsetHeight,
-    document.documentElement.clientHeight
-);
-}
-
 function ready() {
-    let width = getWidth();
-    let height = getHeight();
+    //calulate the demensions after the load
+    antsApp.width = Math.max(
+        document.body.scrollWidth,
+        document.documentElement.scrollWidth,
+        document.body.offsetWidth,
+        document.documentElement.offsetWidth,
+        document.documentElement.clientWidth
+    );
+    antsApp.height = Math.max(
+        document.body.scrollHeight,
+        document.documentElement.scrollHeight,
+        document.body.offsetHeight,
+        document.documentElement.offsetHeight,
+        document.documentElement.clientHeight
+    );
+    //set the canvas size
+    let width = antsApp.width;
+    let height = antsApp.height;
     document.body.style.margin = "0px";
     document.body.style.overflow = "hidden";
     // Create the application helper and add its render target to the page
-    let app = new PIXI.Application({ width: width, height: height });
-    document.body.appendChild(app.view);
+    antsApp.pixiApp = new PIXI.Application({ width: width, height: height });
+    document.body.appendChild(antsApp.pixiApp.view);
 
     //create a quad tree for object collision detection
     let quadTree = new Quadtree({x: 0,y: 0,width: width,height: height}, 4,4);
@@ -41,24 +37,33 @@ function ready() {
     //    app.stage.addChild(groundLoop(width, height)); //(g);
     //});
 
+    // center mark
+    let center = new PIXI.Graphics();
+    center.lineStyle(1, antColorRed, 1);
+    center.moveTo(width/2, 0);
+    center.lineTo(width/2, height);
+    center.moveTo(0, height/2);
+    center.lineTo(width, height/2);
+    antsApp.pixiApp.stage.addChild(center);
+    
 
     // add bugs
     for (let i = 0; i < antsApp.StartingBugs; i++) {
         let bug = antsApp.entity.getBug();
         antsApp.gameEntities.push(bug);
-        app.stage.addChild(bug);
+        antsApp.pixiApp.stage.addChild(bug);
     }
     
     // add ants
     for (let i = 0; i < antsApp.StartingAnts; i++) {
         let ant = antsApp.entity.getAnt();
         antsApp.gameEntities.push(ant);
-        app.stage.addChild(ant);
+        antsApp.pixiApp.stage.addChild(ant);
     }
 
-    mouseSetup(app.stage);
+    mouseSetup();
 
-    app.animationUpdate =
+    antsApp.pixiApp.animationUpdate =
     function(t) {
 
         //let bugLocations = [];
@@ -148,7 +153,7 @@ function ready() {
         });//end of game entities loop
         
         //quad tree collision detection
-        app.render(app.stage);        
+        antsApp.pixiApp.render(antsApp.pixiApp.stage);        
     }
-    app.ticker.add(app.animationUpdate);
+    antsApp.pixiApp.ticker.add(antsApp.pixiApp.animationUpdate);
 }

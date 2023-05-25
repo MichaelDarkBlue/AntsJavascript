@@ -1,4 +1,5 @@
-
+//does not work, this creates too many shapes,
+//I want to look for a way to generate an imaage for the ground
 
 //generate a random green color
 function getRandomGroundColor() {
