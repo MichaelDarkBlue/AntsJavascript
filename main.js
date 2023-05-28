@@ -37,6 +37,12 @@ function ready() {
     //    app.stage.addChild(groundLoop(width, height)); //(g);
     //});
 
+    //test controls
+    //let div_input = document.getElementById("div_input");
+    //div_input.style.position = "absolute";
+    //div_input.style.top = height - 50 + "px";
+    //div_input.style.left = width - 50 + "px";
+
     // center mark
     let center = new PIXI.Graphics();
     center.lineStyle(1, antColorRed, 1);

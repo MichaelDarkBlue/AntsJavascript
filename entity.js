@@ -7,9 +7,9 @@ antsApp.cooldown = 30;
 antsApp.worldSpeed = 1;
 antsApp.worldSize = 1;
 antsApp.antBugRange = 1;
-antsApp.StartingAnts = 10;
-antsApp.StartingBugs = 10;
-antsApp.zoomRate = 1.1;
+antsApp.StartingAnts = 1000;
+antsApp.StartingBugs = 100;
+antsApp.zoomRate = .1;
 
 antsApp.entity = {};
 antsApp.entity.moods = [
