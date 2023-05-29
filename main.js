@@ -22,6 +22,7 @@ function ready() {
     //set the canvas size
     let width = antsApp.width;
     let height = antsApp.height;
+    antsApp.center = {x: width/2, y: height/2};
     document.body.style.margin = "0px";
     document.body.style.overflow = "hidden";
     // Create the application helper and add its render target to the page
@@ -43,6 +44,7 @@ function ready() {
     //div_input.style.top = height - 50 + "px";
     //div_input.style.left = width - 50 + "px";
 
+    /*
     // center mark
     let center = new PIXI.Graphics();
     center.lineStyle(1, antColorRed, 1);
@@ -51,7 +53,12 @@ function ready() {
     center.moveTo(0, height/2);
     center.lineTo(width, height/2);
     antsApp.pixiApp.stage.addChild(center);
-    
+    */
+
+    //add the ants home to the center of the screen
+    let home = antsApp.entity.getHome();
+    antsApp.gameEntities.push(home);
+    antsApp.pixiApp.stage.addChild(home);
 
     // add bugs
     for (let i = 0; i < antsApp.StartingBugs; i++) {
@@ -76,19 +83,12 @@ function ready() {
         quadTree.clear();
 
         antsApp.gameEntities.forEach(e => { 
-            antsApp.entity.move(e,t); 
-            if (!e.ant) quadTree.insert(e);
-            /* /basic collision detection
-            let location = [Math.floor(e.x),Math.floor(e.y)];
-            if (!e.ant){
-                bugLocations.push(location);
-            }else{
-                let hit = bugLocations.includes(location);
-                if (hit){
-                    changeMood(e, getMoodByName("surprised"));
-                }
+            //move the entity
+            if (e.eType != "home"){
+                antsApp.entity.move(e,t); 
             }
-            */
+
+            if (e.eType != "ant") quadTree.insert(e);
 
             //lag stopper
            if(t > 1){
@@ -97,10 +97,11 @@ function ready() {
                 let entities = quadTree.retrieve(e);
                 //lag detection (too many ants packed into a location will not attack the bug)
                 if (entities.length < 30){
-                    entities.forEach(bug => {
+                    entities.forEach(ent => {
                         //only ants attack bugs
-                        if (e.ant && !bug.ant){
+                        if (e.eType == "ant" && ent.eType == "bug"){
                             let ant = e;
+                            let bug = ent;
                             //this ant is near a bug
                             let diffx = Math.abs(ant.x - bug.x);
                             let diffy = Math.abs(ant.y - bug.y);
@@ -113,46 +114,32 @@ function ready() {
                                     bug.tracking.push(ant);
                                 }
 
-                                //mood progression
-                                let maxProgression = antsApp.entity.AntAttackProgression.length - 1;
-                                let currentProgression = antsApp.entity.AntAttackProgression.indexOf(ant.mood.name);
-     
                                 //cooldown
                                 if (ant.moodCooldown < 1){
                                     //if the bug is food then change directly to excited
-                                    if (bug.mood.name == "food"){
-                                        antsApp.entity.changeMood(ant, antsApp.entity.getMoodByName("excited"));
-                                    }else if (currentProgression < maxProgression){
-                                        //if not at max progression
-                                            antsApp.entity.changeMood(ant, antsApp.entity.getMoodByName(antsApp.entity.AntAttackProgression[currentProgression + 1]));
-                                            currentProgression += 1;
+                                    if(ant.mood.name != "withFood"){
+                                        antsApp.entity.AntHuntingBug(bug,ant);
                                     }
                                 }else{
-                                    ant.moodCooldown -= 1;
+                                    ant.moodCooldown--;
                                 }
 
                                 if (ant.mood.attack){
                                     //Now they are angry they will attack and the bug will lose life and then turn into food
-                                    if (bug.mood.name != "worried" && bug.mood.name != "food"){
-                                        antsApp.entity.changeMood(bug, antsApp.entity.getMoodByName("worried"));
-                                    }
-                                    
-                                    bug.life -= ant.hitpoints;
-                                    
-                                    if (bug.life < 1 && bug.mood.name != "food"){
-                                        antsApp.entity.changeMood(bug, antsApp.entity.getMoodByName("food"));
-                                        bug.life = 100;
-                                        //Now that the bug is food the ants need to change to excited
-                                        bug.tracking.forEach(a => {
-                                            antsApp.entity.changeMood(a, antsApp.entity.getMoodByName("excited"));
-                                            //a.tracking = {};
-                                        });
-                                        bug.scale.x = 1.25;
-                                        bug.scale.y = 1.25;
-                                    };//else, the bug is still alive
-                                };//else, the ant is not angry
+                                    antsApp.entity.AntAttackingBug(bug,ant);
+                                }else{
+                                  //else, the ant is not angry
+                                    if (bug.mood.name == "food" && ant.mood.name != "withFood"){
+                                        antsApp.entity.AntEatingFood(bug,ant);
+                                    }  
+                                };
                             };//else, too far away
-                        };//else, this is not an ant
+                        };//else, bug and ant
+                        //console.log(e.mood.name, ent.mood.name);
+                        if (e.mood.name == "withFood" && ent.mood.name == "home"){
+                            let home = ent;
+                            antsApp.entity.AntFoodDrop(e,home);
+                        };
                     });
                 };//else, too many ants in this location
            };//else, lag

@@ -2,14 +2,16 @@ var antsApp = {};
 antsApp.pixiApp = {};
 antsApp.width = 640; //this gets updated on load
 antsApp.height = 480;
+antsApp.center = {x:antsApp.width/2, y:antsApp.height/2}; //updated on load
 antsApp.gameEntities = [];
 antsApp.cooldown = 30;
 antsApp.worldSpeed = 1;
 antsApp.worldSize = 1;
-antsApp.antBugRange = 1;
+antsApp.antBugRange = 10;
 antsApp.StartingAnts = 1000;
-antsApp.StartingBugs = 100;
+antsApp.StartingBugs = 200;
 antsApp.zoomRate = .1;
+antsApp.food = 0;
 
 antsApp.entity = {};
 antsApp.entity.moods = [
@@ -26,7 +28,9 @@ antsApp.entity.moods = [
     {name:"sad",speed:2.25,antColor:antColorDarkYellow,rest:.5,moveDirection:false,randomDirection:true,attack:false},
     {name:"sick",speed:.25,antColor:antColorDarkYellow,rest:.8,moveDirection:false,randomDirection:false,attack:false},
     {name:"food",speed:0,antColor:foodColorOrange,rest:1,moveDirection:false,randomDirection:false,attack:false},
-    {name:"worried",speed:1,antColor:bugColorDarkBrown,rest:0,moveDirection:true,randomDirection:true,attack:false}
+    {name:"worried",speed:1,antColor:bugColorDarkBrown,rest:0,moveDirection:true,randomDirection:true,attack:false},
+    {name:"withFood",speed:.55,antColor:antWithFoodColor,rest:0,moveDirection:true,randomDirection:false,attack:false},
+    {name:"home",speed:0,antColor:homeColor,rest:1,moveDirection:false,randomDirection:false,attack:false}
 ];//,"hungry","sleepy","happy","sad","angry","excited","bored","confused","scared","surprised","sick","silly","shy","tired","worried","lonely","proud","puzzled"];
 antsApp.entity.startingMoods = ["calm","happy","excited","hungry"];
 antsApp.entity.moodsBugs = ["confused","bored","calm","scared","sick"];
@@ -42,10 +46,11 @@ antsApp.entity.getAnt = function () {
     ant.size = 3 * antsApp.worldSize;
     ant.drawRect(0, 0, ant.size, ant.size);
     ant.endFill();
-    ant.ant = true;
+    ant.eType = "ant";
     //ants have a different starting position than default
-    ant.x = antsApp.width / 2;
-    ant.y = antsApp.height / 2;
+    ant.home = antsApp.center;
+    ant.x = ant.home.x;
+    ant.y = ant.home.y;
     return ant;
 }
 
@@ -56,7 +61,7 @@ antsApp.entity.getBase = function (){
     base.direction = Math.random() * 2 * Math.PI;
     base.moodCooldown = 0;
     base.moveCooldown = Math.floor(Math.random() * antsApp.cooldown);
-    base.ant = false;
+    base.eType = "none";
     //ant is tracking a bug
     base.track = {};
     //bug is being tracked by an ant(s)
@@ -78,7 +83,22 @@ antsApp.entity.getBug = function() {
     bug.size = 7 * antsApp.worldSize;
     bug.drawRect(0, 0, bug.size, bug.size);
     bug.endFill();
+    bug.eType = "bug";
     return bug;
+}
+
+//home
+antsApp.entity.getHome = function() {
+    let home =  antsApp.entity.getBase();
+    home.mood = antsApp.entity.getMoodByName("home");
+    home.beginFill(home.mood.antColor);
+    home.size = 10 * antsApp.worldSize;
+    home.drawRect(0, 0, home.size, home.size);
+    home.endFill();
+    home.eType = "home";
+    home.x = antsApp.center.x;
+    home.y = antsApp.center.y;
+    return home;
 }
 
 antsApp.entity.changeMood = function(ent, mood) {
@@ -90,10 +110,15 @@ antsApp.entity.changeMood = function(ent, mood) {
 }
 
 antsApp.entity.move = function(ent, time){
+    let speed = (ent.mood.speed * antsApp.worldSpeed * time);
     if (Math.random() > ent.mood.rest){
-        let speed = (ent.mood.speed * antsApp.worldSpeed * time);
         antsApp.entity.moveRandom(ent, speed);
-        antsApp.entity.moveDirection(ent, speed);
+        if (ent.mood.name == "withFood"){
+            //if the ant has food move it towards the home
+            antsApp.entity.moveDirection(ent, speed, ent.home);
+        }else{
+            antsApp.entity.moveDirection(ent, speed, ent.track);
+        }
     }else if (ent.mood.randomDirection){
         if (ent.moveCooldown < antsApp.cooldown) {
             ent.moveCooldown++;
@@ -122,19 +147,19 @@ antsApp.entity.moveRandom = function(ent, speed) {
     ent.y += Math.random() * speed - (speed/2);
 }
 
-antsApp.entity.moveDirection = function(ent, speed) {
+antsApp.entity.moveDirection = function(ent, speed, location) {
     if (ent.mood.moveDirection){
         //if tracking point towards the tracking point
-        if (ent.track.x != undefined) {
-            let dx = (ent.track.x - ent.x);
-            let dy = (ent.track.y - ent.y);
+        if (location.x != undefined) {
+            let dx = (location.x - ent.x);
+            let dy = (location.y - ent.y);
             ent.direction = Math.atan2(dy, dx);
             antsApp.entity.moveRandom(ent, 5);
         }
         ent.x += Math.cos(ent.direction) * speed;
         ent.y += Math.sin(ent.direction) * speed;
     }
-}
+}    
 
 antsApp.entity.getRandomDirection = function() {
     return Math.random() * 2 * Math.PI;
@@ -154,4 +179,71 @@ antsApp.entity.getMoodByName = function(name) {
 
 antsApp.entity.getAntsByMood = function(mood) {
     return antsApp.gameEntities.filter(ant => ant.mood.name == mood);
+}
+
+//ant is hunting a bug, if food then change to exited.
+antsApp.entity.AntHuntingBug = function(bug, ant) {
+    
+    let maxProgression = antsApp.entity.AntAttackProgression.length - 1;
+    let currentProgression = antsApp.entity.AntAttackProgression.indexOf(ant.mood.name);
+
+    //if the ant is excited and the bug is food
+    if (bug.mood.name == "food" && ant.mood.name != "excited"){
+        antsApp.entity.changeMood(ant, antsApp.entity.getMoodByName("excited"));
+    }else if (currentProgression < maxProgression && ant.mood.name != "mad" && bug.mood.name != "food"){
+        //if not at max progression   
+        antsApp.entity.changeMood(ant, antsApp.entity.getMoodByName(antsApp.entity.AntAttackProgression[currentProgression + 1]));
+    
+        currentProgression++;
+    }
+}
+
+//ant is attacking a bug
+antsApp.entity.AntAttackingBug = function(bug, ant) {
+    if (bug.mood.name != "worried"){
+        antsApp.entity.changeMood(bug, antsApp.entity.getMoodByName("worried"));
+    }
+    
+    bug.life -= ant.hitpoints;
+    
+    if (bug.life < 1){
+        antsApp.entity.changeMood(bug, antsApp.entity.getMoodByName("food"));
+        bug.life = 100;
+        //Now that the bug is food the ants need to change to excited
+        bug.tracking.forEach(a => {
+            antsApp.entity.changeMood(a, antsApp.entity.getMoodByName("excited"));
+            //a.tracking = {};
+        });
+        bug.scale.x = 1.25;
+        bug.scale.y = 1.25;
+    };//else, the bug is still alive
+}
+
+//ant attaching food
+antsApp.entity.AntEatingFood = function(food, ant) {
+    if (ant.mood.name != "withFood"){
+        if(food.life > 0){
+            //ant picks up some food
+            food.life--;
+            antsApp.entity.changeMood(ant, antsApp.entity.getMoodByName("withFood"));
+    
+        }else{
+            //food is gone, remove ants and dispose of food
+            try{
+                bug.tracking.forEach(a => {
+                    antsApp.entity.changeMood(a, antsApp.entity.getMoodByName("happy"));
+                    a.tracking = {};
+                });
+                bug.dispose();
+            }catch(e){
+
+            }
+        }
+    }
+}
+
+//ant returning home
+antsApp.entity.AntFoodDrop = function(ant, home) {
+    antsApp.entity.changeMood(ant, antsApp.entity.getMoodByName("happy"));
+    antsApp.food++;
 }
