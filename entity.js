@@ -8,10 +8,11 @@ antsApp.cooldown = 30;
 antsApp.worldSpeed = 1;
 antsApp.worldSize = 1;
 antsApp.antBugRange = 10;
-antsApp.StartingAnts = 1000;
+antsApp.StartingAnts =  100;
 antsApp.StartingBugs = 200;
 antsApp.zoomRate = .1;
 antsApp.food = 0;
+antsApp.baseSize = 20;
 
 antsApp.entity = {};
 antsApp.entity.moods = [
@@ -68,8 +69,7 @@ antsApp.entity.getBase = function (){
     base.tracking = [];
     base.life = 100;
     base.hitpoints = 1;
-    //enity base event listener
-    base.event
+    base.delete = false;
     return base;
 }
 
@@ -92,12 +92,12 @@ antsApp.entity.getHome = function() {
     let home =  antsApp.entity.getBase();
     home.mood = antsApp.entity.getMoodByName("home");
     home.beginFill(home.mood.antColor);
-    home.size = 10 * antsApp.worldSize;
+    home.size = antsApp.baseSize * antsApp.worldSize;
     home.drawRect(0, 0, home.size, home.size);
     home.endFill();
     home.eType = "home";
-    home.x = antsApp.center.x;
-    home.y = antsApp.center.y;
+    home.x = antsApp.center.x; // - home.size / 2;
+    home.y = antsApp.center.y; // - home.size / 2;
     return home;
 }
 
@@ -111,6 +111,10 @@ antsApp.entity.changeMood = function(ent, mood) {
 
 antsApp.entity.move = function(ent, time){
     let speed = (ent.mood.speed * antsApp.worldSpeed * time);
+    let ant = false;
+    if (ent.eType == "ant"){
+        ant = true;
+    }
     if (Math.random() > ent.mood.rest){
         antsApp.entity.moveRandom(ent, speed);
         if (ent.mood.name == "withFood"){
@@ -154,7 +158,7 @@ antsApp.entity.moveDirection = function(ent, speed, location) {
             let dx = (location.x - ent.x);
             let dy = (location.y - ent.y);
             ent.direction = Math.atan2(dy, dx);
-            antsApp.entity.moveRandom(ent, 5);
+            //antsApp.entity.moveRandom(ent, 5);
         }
         ent.x += Math.cos(ent.direction) * speed;
         ent.y += Math.sin(ent.direction) * speed;
@@ -230,11 +234,12 @@ antsApp.entity.AntEatingFood = function(food, ant) {
         }else{
             //food is gone, remove ants and dispose of food
             try{
-                bug.tracking.forEach(a => {
+                food.tracking.forEach(a => {
                     antsApp.entity.changeMood(a, antsApp.entity.getMoodByName("happy"));
                     a.tracking = {};
                 });
-                bug.dispose();
+                //remove the food
+                food.delete = true;
             }catch(e){
 
             }

@@ -82,6 +82,25 @@ function ready() {
         //let bugLocations = [];
         quadTree.clear();
 
+        //update the entities
+        let deletes = antsApp.gameEntities.filter(e => {return e.delete == true;});
+        deletes.forEach(e => {
+            //if deleting remove entities that are tracking
+            antsApp.gameEntities.forEach(ent => {
+                if (ent.track.x) {
+                    if (ent.track.x == e.x){
+                        ent.track = {};
+                    }
+                }
+            });
+            //delete the entity if it is marked for deletion
+            if (e.delete){
+                antsApp.pixiApp.stage.removeChild(e);
+                e.destroy();
+            }
+        });
+        antsApp.gameEntities = antsApp.gameEntities.filter(e => {return e.delete == false});
+
         antsApp.gameEntities.forEach(e => { 
             //move the entity
             if (e.eType != "home"){
