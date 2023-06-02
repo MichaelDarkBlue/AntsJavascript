@@ -49,7 +49,7 @@ antsApp.entity.getAnt = function () {
     ant.endFill();
     ant.eType = "ant";
     //ants have a different starting position than default
-    ant.home = antsApp.center;
+    ant.home = {x:antsApp.center.x + 9, y:antsApp.center.y + 9};
     ant.x = ant.home.x;
     ant.y = ant.home.y;
     return ant;

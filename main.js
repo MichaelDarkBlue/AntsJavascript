@@ -155,9 +155,15 @@ function ready() {
                             };//else, too far away
                         };//else, bug and ant
                         //console.log(e.mood.name, ent.mood.name);
+                        //ran into home
                         if (e.mood.name == "withFood" && ent.mood.name == "home"){
+                            let ant = e;
                             let home = ent;
-                            antsApp.entity.AntFoodDrop(e,home);
+                            let diffx = Math.abs(ant.x - home.x);
+                            let diffy = Math.abs(ant.y - home.y);
+                            if (diffx < antsApp.antBugRange * antsApp.worldSize && diffy < antsApp.antBugRange * antsApp.worldSize){
+                                antsApp.entity.AntFoodDrop(e,home);
+                            }
                         };
                     });
                 };//else, too many ants in this location
