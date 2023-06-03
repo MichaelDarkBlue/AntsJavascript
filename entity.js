@@ -9,7 +9,8 @@ antsApp.worldSpeed = 1;
 antsApp.worldSize = 1;
 antsApp.antBugRange = 10;
 antsApp.StartingAnts =  10;
-antsApp.StartingBugs = 200;
+antsApp.StartingBugs = 180;
+antsApp.StartingFood = 20;
 antsApp.zoomRate = .1;
 antsApp.food = 0;
 antsApp.foodCostAnt = 5;
@@ -214,6 +215,7 @@ antsApp.entity.AntAttackingBug = function(bug, ant) {
     if (bug.life < 1){
         antsApp.entity.changeMood(bug, antsApp.entity.getMoodByName("food"));
         bug.life = 100;
+        antsApp.StartingFood++;
         //Now that the bug is food the ants need to change to excited
         bug.tracking.forEach(a => {
             antsApp.entity.changeMood(a, antsApp.entity.getMoodByName("excited"));

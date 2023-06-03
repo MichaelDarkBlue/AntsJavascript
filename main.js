@@ -72,6 +72,14 @@ function ready() {
         antsApp.pixiApp.stage.addChild(ant);
     }
 
+    // add food
+    for (let i = 0; i < antsApp.StartingFood; i++) {
+        let food = antsApp.entity.getBug();
+        antsApp.entity.changeMood(food, antsApp.entity.getMoodByName("food"));
+        antsApp.gameEntities.push(food);
+        antsApp.pixiApp.stage.addChild(food);
+    }
+
     mouseSetup();
 
     antsApp.pixiApp.animationUpdate =
@@ -116,6 +124,7 @@ function ready() {
                     let ant = antsApp.entity.getAnt();
                     antsApp.gameEntities.push(ant);
                     antsApp.pixiApp.stage.addChild(ant);
+                    antsApp.StartingAnts++;
                 }
 
                 //quad tree collision detection
@@ -173,6 +182,9 @@ function ready() {
                         };
                     });
                 };//else, too many ants in this location
+
+                //show the current stats
+                antsApp.mainText.display();
            };//else, lag
         });//end of game entities loop
         
