@@ -8,10 +8,11 @@ antsApp.cooldown = 30;
 antsApp.worldSpeed = 1;
 antsApp.worldSize = 1;
 antsApp.antBugRange = 10;
-antsApp.StartingAnts =  100;
+antsApp.StartingAnts =  10;
 antsApp.StartingBugs = 200;
 antsApp.zoomRate = .1;
 antsApp.food = 0;
+antsApp.foodCostAnt = 5;
 antsApp.baseSize = 20;
 
 antsApp.entity = {};
@@ -19,8 +20,8 @@ antsApp.entity.moods = [
     {name:"confused",speed:.80,antColor:antColorBlue,rest:.6,moveDirection:true,randomDirection:true,attack:false},
     {name:"bored",speed:.25,antColor:antColorDarkGreen,rest:.7,moveDirection:true,randomDirection:true,attack:false},
     {name:"calm",speed:.5,antColor:antColorDarkRed,rest:.25,moveDirection:true,randomDirection:true,attack:false},
-    {name:"happy",speed:.6,antColor:antColorYellow,rest:.1,moveDirection:true,randomDirection:true,attack:false},
-    {name:"excited",speed:.75,antColor:antColorGreen,rest:.05,moveDirection:true,randomDirection:true,attack:false},
+    {name:"happy",speed:.9,antColor:antColorYellow,rest:.1,moveDirection:true,randomDirection:true,attack:false},
+    {name:"excited",speed:1,antColor:antColorGreen,rest:.05,moveDirection:true,randomDirection:true,attack:false},
     {name:"hungry",speed:.7,antColor:antColorYellow,rest:.25,moveDirection:true,randomDirection:true,attack:false},
     {name:"scared",speed:1.25,antColor:antColorDarkBlue,rest:.75,moveDirection:false,randomDirection:false,attack:false},
     {name:"surprised",speed:1.25,antColor:antColorYellow,rest:.2,moveDirection:true,randomDirection:true,attack:false},

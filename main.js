@@ -23,8 +23,6 @@ function ready() {
     let width = antsApp.width;
     let height = antsApp.height;
     antsApp.center = {x: width/2, y: height/2};
-    document.body.style.margin = "0px";
-    document.body.style.overflow = "hidden";
     // Create the application helper and add its render target to the page
     antsApp.pixiApp = new PIXI.Application({ width: width, height: height });
     document.body.appendChild(antsApp.pixiApp.view);
@@ -111,6 +109,14 @@ function ready() {
 
             //lag stopper
            if(t > 1){
+                
+                //new ants
+                if (antsApp.food > antsApp.foodCostAnt){
+                    antsApp.food -= antsApp.foodCostAnt;
+                    let ant = antsApp.entity.getAnt();
+                    antsApp.gameEntities.push(ant);
+                    antsApp.pixiApp.stage.addChild(ant);
+                }
 
                 //quad tree collision detection
                 let entities = quadTree.retrieve(e);
