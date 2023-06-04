@@ -7,7 +7,7 @@ function mouseSetup(){
     let startY = 0;
 
     //mouse events
-    document.body.addEventListener("wheel", zoom, { passive: true });
+    document.body.addEventListener("wheel", zoom, false);
     document.body.addEventListener("mousemove", mousePosition, { passive: true });
     document.body.addEventListener("mousedown", mousedown, { passive: true });
     document.body.addEventListener("mouseup", mouseup, { passive: true });
@@ -57,11 +57,15 @@ function mouseSetup(){
 
     //zoom
     function zoom(e) {
+        e.preventDefault();
+
         let scaleX = stage.scale.x;
         let tx = (e.x - stage.x) / scaleX;
         let ty = (e.y - stage.y) / scaleX;
         scaleX += -1 * Math.max(-1, Math.min(1, e.deltaY)) * antsApp.zoomRate * scaleX;
         stage.setTransform(-tx * scaleX + e.x, -ty * scaleX + e.y, scaleX, scaleX);
+    
+        return false;
     }
 
     /*

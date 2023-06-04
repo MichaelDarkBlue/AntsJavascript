@@ -22,6 +22,8 @@ function ready() {
     //set the canvas size
     let width = antsApp.width;
     let height = antsApp.height;
+    //width = 400;
+    //height = 400;
     antsApp.center = {x: width/2, y: height/2};
     // Create the application helper and add its render target to the page
     antsApp.pixiApp = new PIXI.Application({ width: width, height: height });
