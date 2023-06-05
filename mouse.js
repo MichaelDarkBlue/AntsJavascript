@@ -46,6 +46,12 @@ function mouseSetup(){
         stage.scale.x = 1;
         stage.scale.y = 1;
         //document.getElementById("test").innerHTML = "reset: " + debug(e);
+
+        //create menu
+        let close = antsApp.menu.item("Close", antsApp.menu.close);
+        let items = [close];
+        antsApp.menu.display(e, items);
+
         return false;
     }
 
