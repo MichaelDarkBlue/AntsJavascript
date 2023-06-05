@@ -21,7 +21,7 @@ antsApp.entity.moods = [
     {name:"confused",speed:.80,antColor:antColorBlue,rest:.6,moveDirection:true,randomDirection:true,attack:false},
     {name:"bored",speed:.25,antColor:antColorDarkGreen,rest:.7,moveDirection:true,randomDirection:true,attack:false},
     {name:"calm",speed:.5,antColor:antColorDarkRed,rest:.25,moveDirection:true,randomDirection:true,attack:false},
-    {name:"happy",speed:.9,antColor:antColorYellow,rest:.1,moveDirection:true,randomDirection:true,attack:false},
+    {name:"happy",speed:1.2,antColor:antColorYellow,rest:.1,moveDirection:true,randomDirection:true,attack:false},
     {name:"excited",speed:1,antColor:antColorGreen,rest:.05,moveDirection:true,randomDirection:true,attack:false},
     {name:"hungry",speed:.7,antColor:antColorYellow,rest:.25,moveDirection:true,randomDirection:true,attack:false},
     {name:"scared",speed:1.25,antColor:antColorDarkBlue,rest:.75,moveDirection:false,randomDirection:false,attack:false},
@@ -214,6 +214,7 @@ antsApp.entity.AntAttackingBug = function(bug, ant) {
     
     if (bug.life < 1){
         antsApp.entity.changeMood(bug, antsApp.entity.getMoodByName("food"));
+        antsApp.StartingBugs--;
         bug.life = 100;
         antsApp.StartingFood++;
         //Now that the bug is food the ants need to change to excited
